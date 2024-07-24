@@ -1,2 +1,2 @@
 # xgo
-extra golang lib
+extra golang package
