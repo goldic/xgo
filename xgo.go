@@ -89,18 +89,19 @@ func Mute() {
 	recover()
 }
 
-// Go runs the function safely.
-func Go(fn func()) {
-	go Call(fn)
-}
-
-// Call runs the function safely.
+// Call runs the function safely, recovers panic-error.
 func Call(fn func()) (err error) {
 	defer Recover(&err)
 	fn()
 	return
 }
 
+// Go runs the function safely.
+func Go(fn func()) {
+	go Call(fn)
+}
+
+// Async asynchronously runs several functions and waits for them to complete, returns an error in case of panic.
 func Async(fn ...func()) (err error) {
 	var wg sync.WaitGroup
 	wg.Add(len(fn))
@@ -115,6 +116,7 @@ func Async(fn ...func()) (err error) {
 	return
 }
 
+// In returns true if the value is included in the list of values.
 func In[T comparable](v T, values ...T) bool {
 	for _, v2 := range values {
 		if v == v2 {
@@ -124,6 +126,7 @@ func In[T comparable](v T, values ...T) bool {
 	return false
 }
 
+// Or returns the first non-empty value.
 func Or[T comparable](values ...T) (v0 T) {
 	for _, v := range values {
 		if v != v0 {
