@@ -135,3 +135,27 @@ func Or[T comparable](values ...T) (v0 T) {
 	}
 	return
 }
+
+// FilterFn returns v if it is present by filter function.
+func FilterFn[T any](v T, filter func(T) bool) (_ T) {
+	if filter(v) {
+		return v
+	}
+	return
+}
+
+// Exclude returns v if it is not present in vv.
+func Exclude[T comparable](v T, vv ...T) (result T) {
+	if In(v, vv...) {
+		return
+	}
+	return v
+}
+
+// ExcludeFn returns v if it is not present by exclude function.
+func ExcludeFn[T any](v T, exclude func(T) bool) (_ T) {
+	if exclude(v) {
+		return
+	}
+	return v
+}
