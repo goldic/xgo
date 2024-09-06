@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-var (
+const (
 	DarwinOS  = runtime.GOOS == "darwin"
 	WindowsOS = runtime.GOOS == "windows"
 	LinuxOS   = runtime.GOOS == "linux"
