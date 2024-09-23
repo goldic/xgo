@@ -1,7 +1,9 @@
 package xgo
 
 import (
+	"errors"
 	"fmt"
+	"runtime"
 	"sync"
 )
 
@@ -13,33 +15,39 @@ func If[T any](f bool, a, b T) T {
 	return b
 }
 
-// OK panics if err is not null.
-func OK(err error) {
+func noErr(err error) {
 	if err != nil {
+		_, file, line, _ := runtime.Caller(2)
+		err = fmt.Errorf("%w\n\t%s:%d", err, file, line)
 		panic(err)
 	}
 }
 
+// OK panics if err is not null.
+func OK(err error) {
+	noErr(err)
+}
+
 // NoErr panics if err is not null. Synonym of OK(err)
 func NoErr(err error) {
-	OK(err)
+	noErr(err)
 }
 
 // Val returns v or panics if err is not null.
 func Val[T any](v T, err error) T {
-	OK(err)
+	noErr(err)
 	return v
 }
 
 // Val2 returns v1, v2 or panics if err is not null.
 func Val2[T1, T2 any](v1 T1, v2 T2, err error) (T1, T2) {
-	OK(err)
+	noErr(err)
 	return v1, v2
 }
 
 // Val3 returns v1, v2, v3 or panics if err is not null.
 func Val3[T1, T2, T3 any](v1 T1, v2 T2, v3 T3, err error) (T1, T2, T3) {
-	OK(err)
+	noErr(err)
 	return v1, v2, v3
 }
 
@@ -64,10 +72,8 @@ func SafeVal3[T1, T2, T3 any](v1 T1, v2 T2, v3 T3, err error) (T1, T2, T3) {
 // Require panics if statement is false.
 func Require(statement bool, err any) {
 	if !statement {
-		if _, ok := err.(error); ok {
-			panic(err)
-		}
-		panic(fmt.Errorf("%v", err))
+		_, file, line, _ := runtime.Caller(1)
+		panic(fmt.Errorf("%w\n\t%s:%d", err, file, line))
 	}
 }
 
