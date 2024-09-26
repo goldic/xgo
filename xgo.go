@@ -77,14 +77,17 @@ func Require(statement bool, err any) {
 	}
 }
 
-// Recover recovers and returns error by argument pointer.
-func Recover(err *error) {
-	if r := recover(); r != nil && err != nil && *err == nil {
-		if e, ok := r.(error); ok {
-			*err = e
-		} else {
-			*err = fmt.Errorf("%v", r)
+// Catch recovers and returns error by argument pointer.
+func Catch(err *error) {
+	if r := recover(); r != nil && err != nil {
+		e, ok := r.(error)
+		if !ok {
+			e = fmt.Errorf("%v", r)
 		}
+		if *err != nil {
+			e = errors.Join(*err, e)
+		}
+		*err = e
 	}
 }
 
@@ -95,7 +98,7 @@ func Mute() {
 
 // Call runs the function safely, recovers panic-error.
 func Call(fn func()) (err error) {
-	defer Recover(&err)
+	defer Catch(&err)
 	fn()
 	return
 }
@@ -112,7 +115,7 @@ func Async(fn ...func()) (err error) {
 	for _, f := range fn {
 		go func(fn func()) {
 			defer wg.Done()
-			defer Recover(&err)
+			defer Catch(&err)
 			fn()
 		}(f)
 	}
